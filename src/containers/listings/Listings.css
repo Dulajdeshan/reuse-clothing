@@ -1,0 +1,7 @@
+.listings-root {
+    height: calc(100vh - 68.5px);
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    flex-direction: column;
+}

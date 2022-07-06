@@ -1,0 +1,6 @@
+.donate-root {
+    height: calc(100vh - 68.5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
