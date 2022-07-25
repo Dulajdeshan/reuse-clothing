@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { handleLogout } from '../../redux/actions/loginActions';
 
-const pages = ['Sellers'];
+const pages = [];
 const settings = ['Profile', 'Logout'];
 
 function ResponsiveAppBar() {

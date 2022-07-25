@@ -34,10 +34,25 @@ const formatGarmentCondition: any = (
   garmentCondition: string,
   otherGarmentCondition: string
 ) => {
-  if (garmentCondition !== 'other') {
-    return garmentCondition.replaceAll('-', ' ');
+  if (Array.isArray(garmentCondition)) {
+    let newConditions = [...garmentCondition];
+    if (newConditions.includes('other')) {
+      const currentIndex = newConditions.indexOf('other');
+      if (currentIndex >= 0) {
+        newConditions.splice(currentIndex, 1);
+      }
+      if (otherGarmentCondition !== '') {
+        newConditions.push(otherGarmentCondition);
+      }
+    }
+    newConditions = newConditions.map((item) => item.replaceAll('-', ' '));
+    return newConditions.join(',');
+  } else {
+    if (garmentCondition !== 'other') {
+      return garmentCondition.replaceAll('-', ' ');
+    }
+    return otherGarmentCondition;
   }
-  return otherGarmentCondition;
 };
 
 const mapGarmentUsage: any = {
@@ -68,6 +83,7 @@ interface Data {
   garmentWashPeriod: string;
   garmentCondition: string;
   otherGarmentCondition: string;
+  garmentQuality: string;
   createdAt: firebase.firestore.Timestamp;
 }
 
@@ -80,6 +96,7 @@ function createData({
   garmentWashPeriod,
   garmentCondition,
   otherGarmentCondition,
+  garmentQuality,
   createdAt,
 }: Data) {
   return {
@@ -92,6 +109,7 @@ function createData({
       garmentCondition,
       otherGarmentCondition
     ),
+    garmentQuality,
     createdAt: createdAt.toDate(),
   };
 }
@@ -168,6 +186,12 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: 'Garment Condition',
+  },
+  {
+    id: 'garmentQuality',
+    numeric: false,
+    disablePadding: false,
+    label: 'Garment Quality',
   },
   {
     id: 'garmentCount',
@@ -443,6 +467,14 @@ export default function DonationTable({ data, handleDelete }: any) {
                         align="left"
                       >
                         {row.garmentCondition}
+                      </TableCell>
+                      <TableCell
+                        style={{
+                          textTransform: 'capitalize',
+                        }}
+                        align="left"
+                      >
+                        {row.garmentQuality}
                       </TableCell>
                       <TableCell align="right">{row.garmentCount}</TableCell>
                     </TableRow>

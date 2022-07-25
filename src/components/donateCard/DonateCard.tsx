@@ -7,13 +7,16 @@ import CardHeader from '@mui/material/CardHeader';
 import './DonateCard.css';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import Input from '@mui/material/Input';
+import Checkbox from '@mui/material/Checkbox';
+import FormLabel from '@mui/material/FormLabel';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { useState } from 'react';
 
 interface DonateCardProps {
@@ -27,8 +30,9 @@ export default function DonateCard({ loading, handleSubmit }: DonateCardProps) {
   const [otherGarmentType, setOtherGarmentType] = useState('');
   const [garmentUsage, setGarmentUsage] = useState('');
   const [garmentWashPeriod, setGarmentWashPeriod] = useState('');
-  const [garmentCondition, setGarmentCondition] = useState('');
+  const [garmentCondition, setGarmentCondition] = useState<string[]>([]);
   const [otherGarmentCondition, setOtherGarmentCondition] = useState('');
+  const [garmentQuality, setGarmentQuality] = useState('');
 
   const handleGarmentTypeChange = (event: SelectChangeEvent) => {
     setGarmentType(event.target.value as string);
@@ -42,8 +46,25 @@ export default function DonateCard({ loading, handleSubmit }: DonateCardProps) {
     setGarmentWashPeriod(event.target.value as string);
   };
 
-  const handleGarmentConditionChange = (event: SelectChangeEvent) => {
-    setGarmentCondition(event.target.value as string);
+  const handleGarmentQualityChange = (event: SelectChangeEvent) => {
+    setGarmentQuality(event.target.value as string);
+  };
+
+  const handleGarmentConditionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!garmentCondition.includes(event.target.name as string)) {
+      if (event.target.checked) {
+        setGarmentCondition([...garmentCondition, event.target.name as string]);
+      }
+    } else if (!event.target.checked) {
+      const currentConditions = [...garmentCondition];
+      const currentIndex = currentConditions.indexOf(event.target.name);
+      if (currentIndex >= 0) {
+        currentConditions.splice(currentIndex, 1);
+        setGarmentCondition(currentConditions);
+      }
+    }
   };
 
   const onClickSubmit = () => {
@@ -55,6 +76,7 @@ export default function DonateCard({ loading, handleSubmit }: DonateCardProps) {
       garmentWashPeriod,
       garmentCondition,
       otherGarmentCondition,
+      garmentQuality,
     });
   };
   return (
@@ -162,35 +184,80 @@ export default function DonateCard({ loading, handleSubmit }: DonateCardProps) {
               <MenuItem value="more-weekly">More than weekly</MenuItem>
             </Select>
           </FormControl>
+
+          <Box sx={{ display: 'flex' }}>
+            <FormControl
+              sx={{ m: 3 }}
+              component="fieldset"
+              variant="standard"
+              style={{ margin: '10px 0' }}
+            >
+              <FormLabel component="legend">Garment Condition</FormLabel>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={garmentCondition.includes('stains')}
+                      onChange={handleGarmentConditionChange}
+                      name="stains"
+                    />
+                  }
+                  label="Stains"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={garmentCondition.includes('color-shade')}
+                      onChange={handleGarmentConditionChange}
+                      name="color-shade"
+                    />
+                  }
+                  label="Color Shade"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={garmentCondition.includes('defects')}
+                      onChange={handleGarmentConditionChange}
+                      name="defects"
+                    />
+                  }
+                  label="Defects"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={garmentCondition.includes('no-defects')}
+                      onChange={handleGarmentConditionChange}
+                      name="no-defects"
+                    />
+                  }
+                  label="No Defects"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={garmentCondition.includes('other')}
+                      onChange={handleGarmentConditionChange}
+                      name="other"
+                    />
+                  }
+                  label="Other"
+                />
+              </FormGroup>
+            </FormControl>
+          </Box>
+
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                sm: garmentCondition === 'other' ? '1fr 1fr' : '1fr',
-                gap: garmentCondition === 'other' ? 10 : 0,
+                sm: '1fr',
+                gap: 0,
               },
             }}
           >
-            <FormControl variant="standard" className="form-input">
-              <InputLabel id="garmentCondition">
-                Condition of the Garment
-              </InputLabel>
-              <Select
-                variant="standard"
-                labelId="garmentCondition"
-                id="garmentCondition"
-                value={garmentCondition}
-                onChange={handleGarmentConditionChange}
-                style={{ textAlign: 'left' }}
-              >
-                <MenuItem value="stains">Stains</MenuItem>
-                <MenuItem value="color-shade">Color Shade</MenuItem>
-                <MenuItem value="defects">Defects</MenuItem>
-                <MenuItem value="no-defects">No Defects</MenuItem>
-                <MenuItem value="other">Other</MenuItem>
-              </Select>
-            </FormControl>
-            {garmentCondition === 'other' && (
+            {garmentCondition.includes('other') && (
               <FormControl variant="standard" className="form-input">
                 <InputLabel htmlFor="otherGarmentCondition">
                   Enter Garment Condition
@@ -203,6 +270,23 @@ export default function DonateCard({ loading, handleSubmit }: DonateCardProps) {
               </FormControl>
             )}
           </Box>
+          <FormControl variant="standard" className="form-input">
+            <InputLabel id="garmentQuality">Garment Quality</InputLabel>
+            <Select
+              variant="standard"
+              labelId="garmentQuality"
+              id="garmentQuality"
+              value={garmentQuality}
+              onChange={handleGarmentQualityChange}
+              style={{ textAlign: 'left' }}
+            >
+              <MenuItem value="1">1 (Low)</MenuItem>
+              <MenuItem value="2">2</MenuItem>
+              <MenuItem value="3">3</MenuItem>
+              <MenuItem value="4">4</MenuItem>
+              <MenuItem value="5">5 (High)</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
       </CardContent>
       <CardActions>
